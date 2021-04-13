@@ -1,24 +1,49 @@
 import re
 from logger import logger
+import hashlib
+from checksum import get_checksum
+
+def database_check(func):
+	def wrapper(*args):
+		database = args[0]
+		if not database.loaded:
+			database.load()
+
+		return func(*args)
+
+	return wrapper
+
 
 class Database:
 	def __init__(self):
 		self.path = "./_database"
-		self.entries = []
-		self.load()
+		self._entries = []
+		self.loaded = False
+		self.hashsum = 0
 
+	@property
+	@database_check
+	def entries(self):
+		return self._entries
+
+	@entries.setter
+	def entries(self, entries):
+		self._entries = entries
+
+	@database_check
 	def add_entry(self, key, value):
 		if not self.get_entry(key):
-			logger.info(f"ADDING TO DATABASE {key}")
+			logger.info(f"DATABASE:ADD {key}")
 			self.entries.append([key, value])
 
+	@database_check
 	def remove_entry(self, key):
 		entry = self.get_entry(key)
 		if entry:
-			logger.info(f"REMOVING FROM DATABASE: {key}")
+			logger.info(f"DATABASE:REMOVE {key}")
 			self.entries.remove(entry)
 
-
+	@database_check
 	def get_entry(self, key):
 		entries_list = [entry for entry in self.entries if entry[0] == key]
 		if len(entries_list) > 0:
@@ -34,18 +59,30 @@ class Database:
 		return entries
 
 	def save(self):
-		logger.info("DATABASE SAVE")
-		with open(self.path, "w") as f:
-			for entry in self.entries:
-				key = entry[0]
-				data = entry[1].encode('utf-8').hex()
-				f.write(f"{key},{data}\n")
+		if self.hashsum_changed():
+			logger.info("DATABASE:SAVE")
+			with open(self.path, "w") as f:
+				for entry in self.entries:
+					key = entry[0]
+					data = entry[1].encode('utf-8').hex()
+					f.write(f"{key},{data}\n")
 
 	def load(self):
-		logger.info("DATABASE LOAD")
+		logger.info("DATABASE:LOAD")
 		with open(self.path, "r") as f:
 			raw_database = f.read()
 
 			self.entries = self.process_db(raw_database)
+			self.loaded = True
+
+			self.hashsum = get_checksum(self.entries)
+			logger.debug(f"DATABASE#HASHSUM={self.hashsum}")
+
+	def hashsum_changed(self):
+		new_hashsum = get_checksum(self.entries)
+		check = new_hashsum != self.hashsum
+		logger.info(f"DATABASE:CHECKSUM:CHECK ({new_hashsum} != {self.hashsum}) {check}")
+		return check
+
 
 

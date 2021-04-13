@@ -2,6 +2,9 @@ import sys, re
 from database import Database
 from service import Service
 from logger import logger
+from brew import Homebrew
+
+ACTIONS = ["add", "remove", "install", "list", "info", "backup_brew"]
 
 
 class Installer:
@@ -9,34 +12,38 @@ class Installer:
 		self.services = []
 		self.db_path = "./installer"
 		self.database = Database()
-		self.load_from_database()
 
 	def main(self):
 		action = sys.argv[1]
 
-		logger.info(f"ACTION: {action}")
+		logger.info(f"PARSER:ACTION {action}")
 
-		if action == "add":
-			name = sys.argv[2].strip()
-			logger.info(f"SERVICE_NAME: {name}")
+		if self.validate_action(action):
+			self.load_from_database()
 
-			install_command = sys.argv[3].strip()
-			self.add_service(name, install_command)
-		elif action == "remove":
-			name = sys.argv[2].strip()
-			logger.info(f"SERVICE_NAME: {name}")
+			if action == "add":
+				name = sys.argv[2].strip()
+				logger.info(f"PARSER:SERVICE_NAME {name}")
 
-			self.remove_service(name)
-		elif action == "install":
-			self.install_services()
-		elif action == "list":
-			self.list_services()
-		elif action == "info":
-			name = sys.argv[2].strip()
-			logger.info(f"SERVICE_NAME: {name}")
-			self.info_service(name)
+				install_command = sys.argv[3].strip()
+				self.add_service(name, install_command)
+			elif action == "remove":
+				name = sys.argv[2].strip()
+				logger.info(f"PARSER:SERVICE_NAME {name}")
 
-		self.database.save()
+				self.remove_service(name)
+			elif action == "install":
+				self.install_services()
+			elif action == "list":
+				self.list_services()
+			elif action == "info":
+				name = sys.argv[2].strip()
+				logger.info(f"PARSER:SERVICE_NAME {name}")
+				self.info_service(name)
+			elif action == "backup_brew":
+				self.backup_brew()
+
+			self.database.save()
 
 	def add_service(self, name, install_command):
 		service = Service(name, install_command)
@@ -63,13 +70,22 @@ class Installer:
 			return services_list[0]
 
 	def list_services(self):
-		logger.info("INSTALLED SERVICES:")
+		print("INSTALLED SERVICES:")
 		for service in self.services:
 			print(service.name)
 
 	def info_service(self, name):
 		print(self.get_service(name).get_info())
 
+	def backup_brew(self):
+		brew = Homebrew()
+		services = brew.load_brew()
+		for service in services:
+			self.services.append(service)
+			self.database.add_entry(*service.to_db())
+
+	def validate_action(self, action):
+		return action in ACTIONS
 
 installer = Installer()
 
