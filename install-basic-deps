@@ -1,1 +1,38 @@
-/Users/adamgrzybowski/.mackup-backup/Mackup/.basic-config/install-basic-deps
+#!/bin/bash
+
+unameOut="$(uname -s)"
+
+if [ $unameOut = "Darwin" ]; then
+  echo "Installing for MacOS"
+
+#  echo "Installing Homebrew"
+#  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+  to_install_using_brew=(tmux mackup nvm postgresql ag rg tig nmap)
+  for i in "${to_install_using_brew[@]}"
+  do
+     :
+     echo "Installing $i"
+     brew install $i
+  done
+
+#  echo "Installing oh-my-zsh"
+#  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+
+  echo "Installing rvm"
+  gpg2 --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
+  curl -sSL https://get.rvm.io | bash -s stable
+
+#  echo "Intalling fzf"
+#  brew install fzf
+#  $(brew --prefix)/opt/fzf/install
+fi
+
+# TODO: linux deps
+
+
+
+# git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+# git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+# git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm

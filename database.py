@@ -1,4 +1,5 @@
 import re
+from logger import logger
 
 class Database:
 	def __init__(self):
@@ -8,13 +9,13 @@ class Database:
 
 	def add_entry(self, key, value):
 		if not self.get_entry(key):
-			print(f"ADDING TO DATABASE {key}")
+			logger.info(f"ADDING TO DATABASE {key}")
 			self.entries.append([key, value])
 
 	def remove_entry(self, key):
 		entry = self.get_entry(key)
 		if entry:
-			print(f"REMOVING FROM DATABASE: {key}")
+			logger.info(f"REMOVING FROM DATABASE: {key}")
 			self.entries.remove(entry)
 
 
@@ -33,6 +34,7 @@ class Database:
 		return entries
 
 	def save(self):
+		logger.info("DATABASE SAVE")
 		with open(self.path, "w") as f:
 			for entry in self.entries:
 				key = entry[0]
@@ -40,6 +42,7 @@ class Database:
 				f.write(f"{key},{data}\n")
 
 	def load(self):
+		logger.info("DATABASE LOAD")
 		with open(self.path, "r") as f:
 			raw_database = f.read()
 

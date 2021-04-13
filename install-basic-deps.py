@@ -1,14 +1,7 @@
 import sys, re
 from database import Database
 from service import Service
-import logging
-
-database = Database()
-
-logging.basicConfig()
-logging.root.setLevel(logging.NOTSET)
-
-logging.info("STARTING")
+from logger import logger
 
 
 class Installer:
@@ -21,17 +14,17 @@ class Installer:
 	def main(self):
 		action = sys.argv[1]
 
-		logging.info(f"ACTION: {action}")
+		logger.info(f"ACTION: {action}")
 
 		if action == "add":
 			name = sys.argv[2].strip()
-			logging.info(f"SERVICE_NAME: {name}")
+			logger.info(f"SERVICE_NAME: {name}")
 
 			install_command = sys.argv[3].strip()
 			self.add_service(name, install_command)
 		elif action == "remove":
 			name = sys.argv[2].strip()
-			logging.info(f"SERVICE_NAME: {name}")
+			logger.info(f"SERVICE_NAME: {name}")
 
 			self.remove_service(name)
 		elif action == "install":
@@ -40,7 +33,7 @@ class Installer:
 			self.list_services()
 		elif action == "info":
 			name = sys.argv[2].strip()
-			logging.info(f"SERVICE_NAME: {name}")
+			logger.info(f"SERVICE_NAME: {name}")
 			self.info_service(name)
 
 		self.database.save()
@@ -70,7 +63,7 @@ class Installer:
 			return services_list[0]
 
 	def list_services(self):
-		print("INSTALLED SERVICES:")
+		logger.info("INSTALLED SERVICES:")
 		for service in self.services:
 			print(service.name)
 
