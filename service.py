@@ -22,6 +22,7 @@ class Service:
 		logging.info(f"INSTALLER:INSTALL {self.name}")
 		subprocess.run(self.install_command.split(" "))
 
+	# TODO: save platform eg mac, ubuntu
 	def to_db(self):
 		metadata = self.metadata
 		metadata["install_command"] = self.install_command

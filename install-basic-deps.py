@@ -13,6 +13,7 @@ class Installer:
 		self.db_path = "./installer"
 		self.database = Database()
 
+	# TODO: add platform picker? so one backup can be suited for syncing data like mackup (lra/mackup)
 	def main(self):
 		action = sys.argv[1]
 
@@ -21,10 +22,14 @@ class Installer:
 		if self.validate_action(action):
 			self.load_from_database()
 
+			# TODO: pick action based on service/file name instead of simple If.
+			# Put services in actions folder, and load it on startup to check what's available
 			if action == "add":
 				name = sys.argv[2].strip()
 				logger.info(f"PARSER:SERVICE_NAME {name}")
 
+				# TODO don't require install command, define default package managers like brew, apt-get
+				# then add default commands for managers
 				install_command = sys.argv[3].strip()
 				self.add_service(name, install_command)
 			elif action == "remove":

@@ -62,6 +62,7 @@ class Database:
 		if self.hashsum_changed():
 			logger.info("DATABASE:SAVE")
 			with open(self.path, "w") as f:
+				# TODO: don't resave each database entry, only entries that changed
 				for entry in self.entries:
 					key = entry[0]
 					data = entry[1].encode('utf-8').hex()
@@ -81,7 +82,7 @@ class Database:
 	def hashsum_changed(self):
 		new_hashsum = get_checksum(self.entries)
 		check = new_hashsum != self.hashsum
-		logger.info(f"DATABASE:CHECKSUM:CHECK ({new_hashsum} != {self.hashsum}) {check}")
+		logger.debug(f"DATABASE:CHECK_HASHSUM ({new_hashsum} != {self.hashsum}) => {check}")
 		return check
 
 
