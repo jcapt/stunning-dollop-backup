@@ -6,6 +6,7 @@ from logger import logger
 class Homebrew():
 	def __init__(self):
 		self.leaves = []
+		# TODO: Are casks needed?
 		self.casks = []
 		self.services = []
 

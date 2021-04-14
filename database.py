@@ -13,6 +13,18 @@ def database_check(func):
 
 	return wrapper
 
+def extensions_stack(func):
+	def wrapper(*args):
+		database = args[0]
+
+		database.run_extensions_before(func.__name__)
+		res = func(*args)
+		database.run_extensions_after(func.__name__)
+
+		return res
+
+	return wrapper
+
 
 class Database:
 	def __init__(self):
@@ -22,12 +34,21 @@ class Database:
 		self.hashsum = 0
 		self.extensions = []
 
-	# TODO: Implement database hooks and extensions
 	def add_extension(self, extension):
-		pass
+		return self.extensions.append(extension(self))
 
 	def remove_extension(self, extension):
-		pass
+		return self.extensions.remove(extension(self))
+
+	def run_extensions_before(self, func_name):
+		logger.info(f"DATABASE:EXTENSIONS:BEFORE {func_name}")
+		for extension in self.extensions:
+			extension.run_before(func_name)
+
+	def run_extensions_after(self, func_name):
+		logger.info(f"DATABASE:EXTENSIONS:AFTER {func_name}")
+		for extension in self.extensions:
+			extension.run_after(func_name)
 
 	@property
 	@database_check
@@ -39,12 +60,14 @@ class Database:
 		self._entries = entries
 
 	@database_check
+	@extensions_stack
 	def add_entry(self, key, value):
 		if not self.get_entry(key):
 			logger.info(f"DATABASE:ADD {key}")
 			self.entries.append([key, value])
 
 	@database_check
+	@extensions_stack
 	def remove_entry(self, key):
 		entry = self.get_entry(key)
 		if entry:
@@ -52,6 +75,7 @@ class Database:
 			self.entries.remove(entry)
 
 	@database_check
+	@extensions_stack
 	def get_entry(self, key):
 		entries_list = [entry for entry in self.entries if entry[0] == key]
 		if len(entries_list) > 0:
@@ -66,6 +90,7 @@ class Database:
 
 		return entries
 
+	@extensions_stack
 	def save(self):
 		if self.hashsum_changed():
 			logger.info("DATABASE:SAVE")
@@ -76,6 +101,7 @@ class Database:
 					data = entry[1].encode('utf-8').hex()
 					f.write(f"{key},{data}\n")
 
+	@extensions_stack
 	def load(self):
 		logger.info("DATABASE:LOAD")
 		with open(self.path, "r") as f:

@@ -10,6 +10,7 @@ from service_actions.list import ListService
 from service_actions.info import InfoService
 from service_actions.backup_brew import BackupBrewService
 
+from service_database.rebalancer import Rebalancer
 
 ACTIONS = ["add", "remove", "install", "list", "info", "backup_brew"]
 ACTIONS_TO_SERVICES = {
@@ -27,6 +28,7 @@ class Installer:
 		# TODO: Don't store services in array, use models
 		self.services = []
 		self.database = Database()
+		self.database.add_extension(Rebalancer)
 		self.command = Command()
 
 	# TODO: add platform picker? so one backup can be suited for syncing data like mackup (lra/mackup)

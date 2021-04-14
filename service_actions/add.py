@@ -8,8 +8,8 @@ class AddService(BaseService):
 		# TODO don't require install command, define default package managers like brew, apt-get,
 		# then add default commands for managers like "add fzf --brew" instead of
 		# "add fzf 'brew install fzf'"
-		install_command = self.command.install_command
 		name = self.command.name
+		install_command = self.command.install_command
 		self.add_service(name, install_command)
 
 	def add_service(self, name, install_command):

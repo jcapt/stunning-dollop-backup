@@ -1,4 +1,5 @@
 from service_actions.base_service import BaseService
+from brew import Homebrew
 
 
 class BackupBrewService(BaseService):
