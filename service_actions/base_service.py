@@ -12,6 +12,7 @@ class BaseService():
 	def _call(self):
 		raise BaseException("Not implemented error")
 
+	# TODO: Use repository for that kind of retrieving
 	def get_service(self, name):
 		services_list = [service for service in self.services if service.name == name]
 		if len(services_list) > 0:

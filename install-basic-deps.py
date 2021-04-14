@@ -12,7 +12,14 @@ from service_actions.backup_brew import BackupBrewService
 
 
 ACTIONS = ["add", "remove", "install", "list", "info", "backup_brew"]
-ACTIONS_TO_SERVICES = { "add": AddService, "remove": RemoveService, "install": InstallService, "list": ListService, "info": InfoService, "backup_brew": BackupBrewService }
+ACTIONS_TO_SERVICES = {
+		"add": AddService,
+		"remove": RemoveService,
+		"install": InstallService,
+		"list": ListService,
+		"info": InfoService,
+		"backup_brew": BackupBrewService
+}
 
 
 class Installer:
@@ -41,6 +48,5 @@ class Installer:
 		return action in ACTIONS
 
 installer = Installer()
-
 installer.main()
 

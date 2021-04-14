@@ -5,8 +5,9 @@ from brew import Homebrew
 
 class AddService(BaseService):
 	def _call(self):
-		# TODO don't require install command, define default package managers like brew, apt-get
-		# then add default commands for managers
+		# TODO don't require install command, define default package managers like brew, apt-get,
+		# then add default commands for managers like "add fzf --brew" instead of
+		# "add fzf 'brew install fzf'"
 		install_command = self.command.install_command
 		name = self.command.name
 		self.add_service(name, install_command)

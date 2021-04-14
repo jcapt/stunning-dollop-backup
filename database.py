@@ -20,6 +20,14 @@ class Database:
 		self._entries = []
 		self.loaded = False
 		self.hashsum = 0
+		self.extensions = []
+
+	# TODO: Implement database hooks and extensions
+	def add_extension(self, extension):
+		pass
+
+	def remove_extension(self, extension):
+		pass
 
 	@property
 	@database_check
@@ -49,7 +57,7 @@ class Database:
 		if len(entries_list) > 0:
 			return entries_list[0]
 
-	def process_db(self, raw_database):
+	def process_entries(self, raw_database):
 		database = raw_database.split("\n")
 		encoded_entries = [entry.split(",") for entry in database if len(entry) > 0]
 		entries = []
@@ -73,7 +81,7 @@ class Database:
 		with open(self.path, "r") as f:
 			raw_database = f.read()
 
-			self.entries = self.process_db(raw_database)
+			self.entries = self.process_entries(raw_database)
 			self.loaded = True
 
 			self.hashsum = get_checksum(self.entries)
@@ -84,6 +92,4 @@ class Database:
 		check = new_hashsum != self.hashsum
 		logger.debug(f"DATABASE:CHECK_HASHSUM ({new_hashsum} != {self.hashsum}) => {check}")
 		return check
-
-
 
