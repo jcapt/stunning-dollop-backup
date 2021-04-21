@@ -22,14 +22,34 @@ ACTIONS_TO_SERVICES = {
 		"backup_brew": BackupBrewService
 }
 
+class ServicesProxy(list):
+	def append(self, service):
+		super(service)
+
+	def remove(self, service):
+		super(service)
+
+proxy = ServicesProxy()
+print(proxy)
+
+for service in proxy:
+	print(service)
+
 
 class Installer:
 	def __init__(self):
-		# TODO: Don't store services in array, use models
-		self.services = []
+		self._services = []
 		self.database = Database()
 		self.database.add_extension(Rebalancer)
 		self.command = Command()
+
+	@property
+	def services(self):
+		return self._services
+
+	@services.setter
+	def services(self, services):
+		self._services = services
 
 	# TODO: add platform picker? so one backup can be suited for syncing data like mackup (lra/mackup)
 	def main(self):
@@ -48,7 +68,4 @@ class Installer:
 
 	def validate_action(self, action):
 		return action in ACTIONS
-
-installer = Installer()
-installer.main()
 

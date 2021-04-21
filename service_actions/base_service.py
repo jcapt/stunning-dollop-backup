@@ -1,6 +1,7 @@
 class BaseService():
 	def __init__(self, installer):
 		self.installer = installer
+		# TODO: FIX IT, looks really bad
 		self.database = installer.database
 		self.services = installer.services
 		self.command = installer.command

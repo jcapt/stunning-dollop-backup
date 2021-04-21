@@ -95,23 +95,28 @@ class Database:
 		if self.hashsum_changed():
 			logger.info("DATABASE:SAVE")
 			with open(self.path, "w") as f:
+				root_data = ""
 				# TODO: don't resave each database entry, only entries that changed
 				for entry in self.entries:
 					key = entry[0]
 					data = entry[1].encode('utf-8').hex()
-					f.write(f"{key},{data}\n")
+					root_data = root_data + f"{key},{data}\n"
+
+				f.write(root_data.encode('utf-8').hex())
+
 
 	@extensions_stack
 	def load(self):
 		logger.info("DATABASE:LOAD")
 		with open(self.path, "r") as f:
-			raw_database = f.read()
+			database_string = f.read()
+			raw_database = bytearray.fromhex(database_string).decode()
 
 			self.entries = self.process_entries(raw_database)
 			self.loaded = True
 
 			self.hashsum = get_checksum(self.entries)
-			logger.debug(f"DATABASE#HASHSUM={self.hashsum}")
+			logger.debug(f"DATABASE:HASHSUM => {self.hashsum}")
 
 	def hashsum_changed(self):
 		new_hashsum = get_checksum(self.entries)
