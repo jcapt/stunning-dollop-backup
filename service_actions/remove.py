@@ -9,5 +9,4 @@ class RemoveService(BaseService):
 		service = self.get_service(name)
 		if service:
 			self.services.remove(service)
-			self.database.remove_entry(name)
 

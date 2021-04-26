@@ -27,7 +27,7 @@ class Service:
 		metadata = self.metadata
 		metadata["install_command"] = self.install_command
 		self.metadata["created_at"] = datetime.datetime.now().isoformat()
-		return [self.name, json.dumps(metadata)]
+		return [self.name, metadata]
 
 	def get_info(self):
 		return f"COMMAND: {self.install_command} \nMETADATA: {self.metadata}"

@@ -9,5 +9,4 @@ class BackupBrewService(BaseService):
 		for service in services:
 			# TODO don't do both actions
 			self.services.append(service)
-			self.database.add_entry(*service.to_db())
 

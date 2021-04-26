@@ -15,6 +15,4 @@ class AddService(BaseService):
 	def add_service(self, name, install_command):
 		service = Service(name, install_command)
 		self.services.append(service)
-		self.database.add_entry(*service.to_db())
-
 

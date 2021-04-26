@@ -2,6 +2,8 @@ import re
 from logger import logger
 import hashlib
 from checksum import get_checksum
+from database_extension import DatabaseExtension, extensions_stack
+import json
 
 def database_check(func):
 	def wrapper(*args):
@@ -13,42 +15,14 @@ def database_check(func):
 
 	return wrapper
 
-def extensions_stack(func):
-	def wrapper(*args):
-		database = args[0]
 
-		database.run_extensions_before(func.__name__)
-		res = func(*args)
-		database.run_extensions_after(func.__name__)
-
-		return res
-
-	return wrapper
-
-
-class Database:
+class Database(DatabaseExtension):
 	def __init__(self):
 		self.path = "./_database"
 		self._entries = []
 		self.loaded = False
 		self.hashsum = 0
 		self.extensions = []
-
-	def add_extension(self, extension):
-		return self.extensions.append(extension(self))
-
-	def remove_extension(self, extension):
-		return self.extensions.remove(extension(self))
-
-	def run_extensions_before(self, func_name):
-		logger.info(f"DATABASE:EXTENSIONS:BEFORE {func_name}")
-		for extension in self.extensions:
-			extension.run_before(func_name)
-
-	def run_extensions_after(self, func_name):
-		logger.info(f"DATABASE:EXTENSIONS:AFTER {func_name}")
-		for extension in self.extensions:
-			extension.run_after(func_name)
 
 	@property
 	@database_check
@@ -61,10 +35,10 @@ class Database:
 
 	@database_check
 	@extensions_stack
-	def add_entry(self, key, value):
+	def add_entry(self, key, service):
 		if not self.get_entry(key):
-			logger.info(f"DATABASE:ADD {key}")
-			self.entries.append([key, value])
+			logger.info(f"DATABASE:ADD {key}, {service}")
+			self.entries.append([key, json.dumps(service)])
 
 	@database_check
 	@extensions_stack

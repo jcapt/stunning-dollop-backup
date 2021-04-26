@@ -2,6 +2,7 @@ import sys, re
 from database import Database
 from service import Service
 from command import Command
+from service_proxy import ServicesProxy
 
 from service_actions.add import AddService
 from service_actions.remove import RemoveService
@@ -11,8 +12,8 @@ from service_actions.info import InfoService
 from service_actions.backup_brew import BackupBrewService
 
 from service_database.rebalancer import Rebalancer
+from service_database.platform_saver import PlatformSaver
 
-ACTIONS = ["add", "remove", "install", "list", "info", "backup_brew"]
 ACTIONS_TO_SERVICES = {
 		"add": AddService,
 		"remove": RemoveService,
@@ -22,34 +23,14 @@ ACTIONS_TO_SERVICES = {
 		"backup_brew": BackupBrewService
 }
 
-class ServicesProxy(list):
-	def append(self, service):
-		super(service)
-
-	def remove(self, service):
-		super(service)
-
-proxy = ServicesProxy()
-print(proxy)
-
-for service in proxy:
-	print(service)
-
 
 class Installer:
 	def __init__(self):
-		self._services = []
 		self.database = Database()
 		self.database.add_extension(Rebalancer)
+		self.database.add_extension(PlatformSaver)
 		self.command = Command()
-
-	@property
-	def services(self):
-		return self._services
-
-	@services.setter
-	def services(self, services):
-		self._services = services
+		self._services = ServicesProxy(self.database, [])
 
 	# TODO: add platform picker? so one backup can be suited for syncing data like mackup (lra/mackup)
 	def main(self):
@@ -62,10 +43,18 @@ class Installer:
 
 			self.database.save()
 
+	@property
+	def services(self):
+		return self._services
+
+	@services.setter
+	def services(self, services):
+		self._services = ServicesProxy(self.database, [])
+
 	def load_from_database(self):
 		for entry in self.database.entries:
-			self.services.append(Service.from_database(entry))
+			self.services.raw_append(Service.from_database(entry))
 
 	def validate_action(self, action):
-		return action in ACTIONS
+		return action in ACTIONS_TO_SERVICES.keys()
 
