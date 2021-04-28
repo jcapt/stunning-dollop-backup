@@ -7,6 +7,5 @@ class BackupBrewService(BaseService):
 		brew = Homebrew()
 		services = brew.load_brew()
 		for service in services:
-			# TODO don't do both actions
 			self.services.append(service)
 
