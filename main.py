@@ -4,12 +4,15 @@ from service import Service
 from command import Command
 from service_proxy import ServicesProxy
 
+from configuration import Configuration
+
 from service_actions.add import AddService
 from service_actions.remove import RemoveService
 from service_actions.install import InstallService
 from service_actions.list import ListService
 from service_actions.info import InfoService
 from service_actions.backup_brew import BackupBrewService
+from service_actions.configuration_service import ConfigurationService
 
 from service_database.rebalancer import Rebalancer
 from service_database.platform_saver import PlatformSaver
@@ -20,8 +23,18 @@ ACTIONS_TO_SERVICES = {
 		"install": InstallService,
 		"list": ListService,
 		"info": InfoService,
-		"backup_brew": BackupBrewService
+		"backup_brew": BackupBrewService,
+		"configuration": ConfigurationService
 }
+
+class Config():
+	def __init__(self):
+		self.config_path = './config'
+		self.items = {}
+
+	@property
+	def app_manager(self):
+		return self.items['app_manager']
 
 
 class Installer:
@@ -29,8 +42,14 @@ class Installer:
 		self.database = Database()
 		self.database.add_extension(Rebalancer)
 		self.database.add_extension(PlatformSaver)
+
 		self.command = Command()
+		self.configuration = Configuration()
 		self._services = ServicesProxy(self.database, [])
+
+		# TODO: change a way how config is loaded
+		self.config = Config()
+		ConfigurationService(self).load()
 
 	# TODO: add platform picker? so one backup can be suited for syncing data like mackup (lra/mackup)
 	def main(self):
@@ -42,6 +61,8 @@ class Installer:
 			ACTIONS_TO_SERVICES[action].call(self)
 
 			self.database.save()
+
+		print(self.config.app_manager)
 
 	@property
 	def services(self):

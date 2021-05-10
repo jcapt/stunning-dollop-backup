@@ -1,10 +1,11 @@
 class BaseService():
 	def __init__(self, installer):
 		self.installer = installer
-		# TODO: FIX IT, looks really bad
+		# TODO: fix it, it's highly coupled with installer
 		self.database = installer.database
 		self.services = installer.services
 		self.command = installer.command
+		self.config = installer.config
 
 	@classmethod
 	def call(cls, installer):
